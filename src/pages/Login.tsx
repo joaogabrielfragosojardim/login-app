@@ -1,7 +1,19 @@
+import { FormEvent, useState } from "react";
 import styled from "styled-components";
 import { Logo } from "../components/Logo";
+import { api } from "../api/api";
 
 export const Login = () => {
+  const [user, setUser] = useState({});
+
+  const sendUser = async (event: FormEvent) => {
+    event.preventDefault();
+    const token = await api.post("/api/auth/local", user);
+    const {
+      data: { jwt },
+    } = token;
+    localStorage.setItem("token", jwt);
+  };
   return (
     <Container>
       <CardContainer>
@@ -9,9 +21,23 @@ export const Login = () => {
           <Logo />
         </div>
         <div>
-          <form>
-            <input placeholder="Email"></input>
-            <input placeholder="Senha"></input>
+          <form
+            onSubmit={(e) => {
+              sendUser(e);
+            }}
+          >
+            <input
+              onChange={(e) => {
+                setUser({ ...user, identifier: e.target.value });
+              }}
+              placeholder="Email"
+            />
+            <input
+              placeholder="Senha"
+              onChange={(e) => {
+                setUser({ ...user, password: e.target.value });
+              }}
+            />
             <SignUpButton>Login</SignUpButton>
             <div>
               <a href="#">Esqueceu a senha?</a>
